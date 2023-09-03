@@ -1,0 +1,38 @@
+cmd - return : osascript ~/.config/skhd/iterm.scpt
+
+cmd - 0 : open -na 'google chrome'
+
+cmd - tab : yabai -m space --focus next
+cmd - escape : yabai -m space --focus prev
+
+cmd - e : yabai -m space --toggle show-desktop
+
+alt - n : yabai -m space --create && \
+	index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
+	yabai -m space --focus "${index}"
+
+ctrl + alt - n : yabai -m space --create && \
+	index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
+	yabai -m window --space "${index}" && \
+	yabai -m space --focus "${index}"
+
+ctrl + alt - backspace :
+	index="$(yabai -m query --spaces --display | jq 'map(select(."has-focus" == true))[0].index')" && \
+	yabai -m space --destroy && \
+	yabai -m space --focus "${index}" || yabai -m space --focus "$(($index - 1))" \
+	&& yabai -m query --spaces --display | \
+	jq -re 'map(select(."is-native-fullscreen" == false)) | length > 1' \
+	&& yabai -m query --spaces | \
+	jq -re 'map(select(."windows" == []).index) | reverse | .[] ' | \
+	xargs -I % sh -c 'yabai -m space % --destroy'
+
+cmd - g : yabai -m window --toggle zoom-fullscreen
+
+cmd - s [
+	"google chrome" : skhd --key "cmd + shift - h"
+]
+
+ctrl + alt - left : yabai -m window --swap west
+ctrl + alt - down : yabai -m window --swap south
+ctrl + alt - up : yabai -m window --swap north
+ctrl + alt - right : yabai -m window --swap east
